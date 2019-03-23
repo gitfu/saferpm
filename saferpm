@@ -24,7 +24,6 @@ relinked=['rpmquery','rpmverify']
 rpm_bin="/usr/bin"
 rpm_db="/var/lib/rpm"
 saferpm='saferpm'
-saferpm_path="%s/%s"%(rpm_bin,saferpm)
 
 
 def replace():
@@ -33,7 +32,8 @@ def replace():
 	then create rpm and rpmdb symlinks to saferpm
 	'''
 	for r in replaced:
-		linkpath="%s/%s"%(rpm_bin,r)
+		linkpath=shutil.which(r)
+		saferpm_path=linkpath.replace(r,saferpm)
 		if not os.path.islink(linkpath):
 			print('saferpm --> replacing %s'%linkpath)
 			os.renames(linkpath,"%s/%s"%(safe_bin,r))
@@ -57,6 +57,7 @@ def install():
 	'''
 	if saferpm in sys.argv[0]:
 		print('saferpm --> installing saferpm')
+		saferpm_path=shutil.which('rpm').replace('rpm',saferpm)
 		if sys.argv[0] !=saferpm_path:
 			if os.path.exists(saferpm_path):
 				os.unlink(saferpm_path)

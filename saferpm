@@ -56,8 +56,8 @@ def install():
 	* Backup rpm database
 	'''
 	if saferpm in sys.argv[0]:
+		print('saferpm --> installing saferpm')
 		if sys.argv[0] !=saferpm_path:
-			print('saferpm --> installing saferpm')
 			if os.path.exists(saferpm_path):
 				os.unlink(saferpm_path)
 			shutil.copy(sys.argv[0],saferpm_path)

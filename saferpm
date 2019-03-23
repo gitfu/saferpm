@@ -129,12 +129,8 @@ def run_cmd(failed):
 	if cmd returns an error code or seg fault
 	'''
 	rc= data.returncode
-	std=data.stdout
-	err=data.stderr
-	all =std+err
-	print("RETURN CODE  ",rc)
-	if b'missing' in all:
-		print('FAIL')
+	both=data.stdout+data.stderr
+	if b'Segmentation fault' in both:
 		'''
 		since it failed, restore the database
 		'''
@@ -145,12 +141,10 @@ def run_cmd(failed):
 		if not failed:			
 			return run_cmd(True)
 		else:
-			print(std.decode("utf-8"))
-			print(err.decode("utf-8"))
+			print(both.decode("utf-8"))
 			return rc
 	else:
-		print(err.decode("utf-8"))
-		print(std.decode("utf-8"))
+		print(both.decode("utf-8"))
 		backup_db()
 		return rc
 

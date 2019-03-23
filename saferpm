@@ -38,6 +38,7 @@ def relink():
 	'''
 	for r in relinked:
 		if not os.path.islink("%s/%s"%(safe_bin,r)):
+			print("saferpm --> linking %s/%s"%(safe_bin,r)) 
 			os.symlink("%s/rpm"%safe_bin,"%s/%s"%(safe_bin,r))
 
 def install():

@@ -124,7 +124,7 @@ def run_cmd(failed):
 	if '--rebuilddb' in cmd:
 		restore_db()
 		return 0
-	data=subprocess.run(cmd,stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+	data=subprocess.run(cmd,stderr=subprocess.PIPE) #, stdout=subprocess.PIPE)
 	'''
 	if cmd returns an error code or seg fault
 	'''

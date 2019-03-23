@@ -26,11 +26,10 @@ def replace():
 	'''
 	for r in replaced:
 		linkpath=shutil.which(r)
-		mk_saferpm_path()
 		if not os.path.islink(linkpath):
 			print('saferpm --> replacing %s'%linkpath)
 			os.renames(linkpath,"%s/%s"%(safe_bin,r))
-			os.symlink(saferpm_path,linkpath)
+			os.symlink(mk_saferpm_path(),linkpath)
 	relink()
 
 	

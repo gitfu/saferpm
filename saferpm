@@ -19,7 +19,7 @@ import subprocess
 safe="/usr/lib/safe"
 safe_bin="%s/bin"%(safe)
 safe_db="%s/rpm"%(safe)
-replaced=['rpm','rpmdb']
+replaced=['rpm','rpmdb','rpmquery','rpmverify']
 relinked=['rpmquery','rpmverify']
 rpm_bin="/usr/bin"
 rpm_db="/var/lib/rpm"
@@ -38,7 +38,7 @@ def replace():
 			print('saferpm --> replacing %s'%linkpath)
 			os.renames(linkpath,"%s/%s"%(safe_bin,r))
 			os.symlink(saferpm_path,linkpath)
-	relink()
+	#relink()
 
 	
 def relink():

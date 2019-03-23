@@ -38,7 +38,7 @@ def replace():
 			print('saferpm --> replacing %s'%linkpath)
 			os.renames(linkpath,"%s/%s"%(safe_bin,r))
 			os.symlink(saferpm_path,linkpath)
-	#relink()
+	relink()
 
 	
 def relink():

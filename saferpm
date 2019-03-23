@@ -131,8 +131,10 @@ def run_cmd(failed):
 	rc= data.returncode
 	std=data.stdout
 	err=data.stderr
+	all =std+err
 	print("RETURN CODE  ",rc)
-	if rc !=0 or b'missing' in err:
+	if b'missing' in all:
+		print('FAIL')
 		'''
 		since it failed, restore the database
 		'''

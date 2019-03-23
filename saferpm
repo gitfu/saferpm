@@ -139,7 +139,7 @@ def run_cmd(failed):
 		if this is the first failure , try again.
 		'''
 		if not failed:			
-			run_cmd(True)
+			return run_cmd(True)
 		else:
 			print(data.stderr.decode("utf-8"))
 			return rc

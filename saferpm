@@ -83,7 +83,7 @@ def chk_cmd():
 
 def copy_db(src,dest):
 	'''
-	rsync db dirs
+	copy db dirs
 	'''
 	clean_db(src)
 	shutil.rmtree(dest)

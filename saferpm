@@ -78,6 +78,7 @@ def chk_cmd():
 	if saferpm in cmd[0]:
 		sys.exit(0)
 	cmd[0]="%s/%s"%(safe_bin,os.path.split(cmd[0])[1])
+	cmd.append("--dbpath=%s"%rpm_db)
 	return cmd
 
 

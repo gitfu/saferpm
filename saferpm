@@ -16,6 +16,8 @@ relinked=['rpmquery','rpmverify']
 rpm_db="/var/lib/rpm"
 saferpm='saferpm'
 
+def mk_saferpm_path():
+	return shutil.which('rpm').replace('rpm',saferpm)
 
 def replace():
 	'''
@@ -24,7 +26,7 @@ def replace():
 	'''
 	for r in replaced:
 		linkpath=shutil.which(r)
-		saferpm_path=linkpath.replace(r,saferpm)
+		mk_saferpm_path()
 		if not os.path.islink(linkpath):
 			print('saferpm --> replacing %s'%linkpath)
 			os.renames(linkpath,"%s/%s"%(safe_bin,r))
@@ -49,7 +51,7 @@ def install():
 	'''
 	if saferpm in sys.argv[0]:
 		print('saferpm --> installing saferpm')
-		saferpm_path=shutil.which('rpm').replace('rpm',saferpm)
+		saferpm_path=mk_saferpm_path()
 		if sys.argv[0] !=saferpm_path:
 			if os.path.exists(saferpm_path):
 				os.unlink(saferpm_path)
@@ -111,26 +113,18 @@ def run_cmd(failed):
 	Call rpm command from /usr/lib/safe/bin
 	'''
 	cmd=chk_cmd()
-	'''
-	if --rebuilddb is in the command,  restore the database
-	'''
+	'''if --rebuilddb is in the command,  restore the database'''
 	if '--rebuilddb' in cmd:
 		restore_db()
 		return 0
 	data=subprocess.run(cmd,stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-	'''
-	if cmd returns an error code or seg fault
-	'''
+	'''if cmd returns an error code or seg fault'''
 	rc= data.returncode
 	both=data.stdout+data.stderr
 	if rc !=0 or b'Segmentation fault' in both:
-		'''
-		since it failed, restore the database
-		'''
+		'''since it failed, restore the database'''
 		restore_db()
-		'''
-		if this is the first failure , try again.
-		'''
+		'''if this is the first failure , try again.'''
 		if not failed:			
 			return run_cmd(True)
 		else:

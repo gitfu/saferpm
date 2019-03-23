@@ -128,6 +128,7 @@ def run_cmd(failed):
 	'''
 	if cmd returns an error code or seg fault
 	'''
+	print("RETURN CODE  ",data.returncode)
 	if data.returncode !=0 or b'Segmentation fault' in data.stderr:
 		'''
 		since it failed, restore the database
@@ -140,7 +141,7 @@ def run_cmd(failed):
 			run_cmd(True)
 		else:
 			print(data.stderr.decode("utf-8"))
-			return -1
+			sys.exit(-1)
 	else:
 		print(data.stderr.decode("utf-8"))
 		#print(data.stdout.decode("utf-8"))

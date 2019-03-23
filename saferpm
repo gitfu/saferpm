@@ -156,7 +156,6 @@ if __name__=='__main__':
 	'''
 	this is to catch rpm upgrades
 	'''
-	print("RC ->",rc)
 	if rc==0:
 		replace()
 	sys.exit(rc)

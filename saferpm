@@ -1,0 +1,160 @@
+#!/usr/bin/env python3
+
+'''
+install:
+as root
+    chmod +x saferpm
+    ./saferpm
+    run rpm commands normally
+'''
+
+import os
+import shlex
+import sys
+import shutil
+import sys
+import subprocess
+
+
+safe="/usr/lib/safe"
+safe_bin="%s/bin"%(safe)
+safe_db="%s/rpm"%(safe)
+replaced=['rpm','rpmdb']
+relinked=['rpmquery','rpmverify']
+rpm_bin="/usr/bin"
+rpm_db="/var/lib/rpm"
+saferpm='saferpm'
+saferpm_path="%s/%s"%(rpm_bin,saferpm)
+
+
+def replace():
+	'''
+	move rpm and rpmdb to /usr/lib/safe/bin
+	then create rpm and rpmdb symlinks to saferpm
+	'''
+	for r in replaced:
+		linkpath="%s/%s"%(rpm_bin,r)
+		if not os.path.islink(linkpath):
+			print('saferpm --> replacing %s'%linkpath)
+			os.renames(linkpath,"%s/%s"%(safe_bin,r))
+			os.symlink(saferpm_path,linkpath)
+	relink()
+
+	
+def relink():
+	'''
+	link rpmverify and rpmquery to safe_bin/rpm
+	'''
+	for r in relinked:
+		os.unlink("%s/%s"%(rpm_bin,r))
+		os.symlink("%s/rpm"%safe_bin,"%s/%s"%(rpm_bin,r))
+
+def install():
+	'''
+	* Install saferpm script to /usr/bin if it isnt found
+	* Create /usr/lib/safe/bin /usr/lib/safe/rpm
+	* Backup rpm database
+	'''
+	if saferpm in sys.argv[0]:
+		if sys.argv[0] !=saferpm_path:
+			print('saferpm --> installing saferpm')
+			if os.path.exists(saferpm_path):
+				os.unlink(saferpm_path)
+			shutil.copy(sys.argv[0],saferpm_path)
+	for d in [safe_bin,safe_db]:
+		if not os.path.isdir(d):
+			print('saferpm --> creating %s'%d)
+			os.makedirs(d)
+	if len(os.listdir(safe_db))==0:
+		backup_db()
+	replace()
+
+
+def chk_cmd():
+	'''
+	Translates wrapped rpm command to actual rpm command
+	'''
+	cmd=sys.argv
+	if saferpm in cmd[0]:
+		sys.exit(0)
+	cmd[0]="%s/%s"%(safe_bin,os.path.split(cmd[0])[1])
+	return cmd
+
+
+def copy_db(src,dest):
+	'''
+	rsync db dirs
+	'''
+	clean_db(src)
+	shutil.rmtree(dest)
+	shutil.copytree(src,dest)
+	
+
+def restore_db():
+	'''
+	restore rpm db
+	'''
+	copy_db(safe_db,rpm_db)
+	
+
+def backup_db():
+	'''
+	backup rpm db
+	'''
+	copy_db(rpm_db,safe_db)
+	
+
+def clean_db(db_dir):
+	'''
+	remove problematic db files
+	'''
+	for f in os.listdir(db_dir):
+		if f.startswith(r'__') or f.endswith('lock'): os.unlink("%s/%s"%(db_dir,f))
+
+
+def run_cmd(failed):
+	'''
+	Call rpm command from /usr/lib/safe/bin
+	'''
+	cmd=chk_cmd()
+	'''
+	if --rebuilddb is in the command,  restore the database
+	'''
+	if '--rebuilddb' in cmd:
+		restore_db()
+		return 0
+	data=subprocess.run(cmd,stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+	'''
+	if cmd returns an error code or seg fault
+	'''
+	if data.returncode !=0 or b'Segmentation fault' in data.stderr:
+		'''
+		since it failed, restore the database
+		'''
+		restore_db()
+		'''
+		if this is the first failure , try again.
+		'''
+		if not failed:
+			#print(data.stderr.decode("utf-8"))
+			run_cmd(True)
+		else:
+			print(data.stderr.decode("utf-8"))
+			return data.returncode
+	else:
+		print(data.stdout.decode("utf-8"))
+		backup_db()
+		return data.returncode
+
+
+
+if __name__=='__main__':
+	install()
+	rc=run_cmd(False)
+	'''
+	this is to catch rpm upgrades
+	'''
+	if rc==0:
+		replace()
+	sys.exit(rc)
+

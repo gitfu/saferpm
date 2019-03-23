@@ -19,7 +19,7 @@ import subprocess
 safe="/usr/lib/safe"
 safe_bin="%s/bin"%(safe)
 safe_db="%s/rpm"%(safe)
-replaced=['rpm','rpmdb','rpmquery','rpmverify']
+replaced=['rpm','rpmdb']
 relinked=['rpmquery','rpmverify']
 rpm_bin="/usr/bin"
 rpm_db="/var/lib/rpm"
@@ -46,8 +46,8 @@ def relink():
 	link rpmverify and rpmquery to safe_bin/rpm
 	'''
 	for r in relinked:
-		os.unlink("%s/%s"%(rpm_bin,r))
-		os.symlink("%s/rpm"%safe_bin,"%s/%s"%(rpm_bin,r))
+		if not os.path.islink("%s/%s"%(safe_bin,r)):
+			os.symlink("%s/rpm"%safe_bin,"%s/%s"%(safe_bin,r))
 
 def install():
 	'''

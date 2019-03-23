@@ -16,9 +16,6 @@ relinked=['rpmquery','rpmverify']
 rpm_db="/var/lib/rpm"
 saferpm='saferpm'
 
-def mk_saferpm_path():
-	return shutil.which('rpm').replace('rpm',saferpm)
-
 def replace():
 	'''
 	move rpm and rpmdb to /usr/lib/safe/bin
@@ -26,10 +23,11 @@ def replace():
 	'''
 	for r in replaced:
 		linkpath=shutil.which(r)
+		saferpm_path=linkpath.replace(r,saferpm)
 		if not os.path.islink(linkpath):
 			print('saferpm --> replacing %s'%linkpath)
 			os.renames(linkpath,"%s/%s"%(safe_bin,r))
-			os.symlink(mk_saferpm_path(),linkpath)
+			os.symlink(saferpm_path,linkpath)
 	relink()
 
 	
@@ -50,7 +48,7 @@ def install():
 	'''
 	if saferpm in sys.argv[0]:
 		print('saferpm --> installing saferpm')
-		saferpm_path=mk_saferpm_path()
+		saferpm_path=shutil.which('rpm').replace('rpm',saferpm)
 		if sys.argv[0] !=saferpm_path:
 			if os.path.exists(saferpm_path):
 				os.unlink(saferpm_path)

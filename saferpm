@@ -124,13 +124,15 @@ def run_cmd(failed):
 	if '--rebuilddb' in cmd:
 		restore_db()
 		return 0
-	data=subprocess.run(cmd,stderr=subprocess.PIPE) #, stdout=subprocess.PIPE)
+	data=subprocess.run(cmd,stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 	'''
 	if cmd returns an error code or seg fault
 	'''
 	rc= data.returncode
+	std=data.stdout
+	err=data.stderr
 	print("RETURN CODE  ",rc)
-	if rc !=0 or b'Segmentation fault' in data.stderr:
+	if rc !=0 or b'missing' in err:
 		'''
 		since it failed, restore the database
 		'''
@@ -141,11 +143,12 @@ def run_cmd(failed):
 		if not failed:			
 			return run_cmd(True)
 		else:
-			print(data.stderr.decode("utf-8"))
+			print(std.decode("utf-8"))
+			print(err.decode("utf-8"))
 			return rc
 	else:
-		print(data.stderr.decode("utf-8"))
-		#print(data.stdout.decode("utf-8"))
+		print(err.decode("utf-8"))
+		print(std.decode("utf-8"))
 		backup_db()
 		return rc
 

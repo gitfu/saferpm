@@ -136,13 +136,13 @@ def run_cmd(failed):
 		'''
 		if this is the first failure , try again.
 		'''
-		if not failed:
-			#print(data.stderr.decode("utf-8"))
+		if not failed:			
 			run_cmd(True)
 		else:
 			print(data.stderr.decode("utf-8"))
 			return data.returncode
 	else:
+		print(data.stderr.decode("utf-8"))
 		print(data.stdout.decode("utf-8"))
 		backup_db()
 		return data.returncode

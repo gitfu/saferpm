@@ -141,7 +141,7 @@ def run_cmd(failed):
 			run_cmd(True)
 		else:
 			print(data.stderr.decode("utf-8"))
-			sys.exit(-1)
+			return -1
 	else:
 		print(data.stderr.decode("utf-8"))
 		#print(data.stdout.decode("utf-8"))

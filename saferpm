@@ -130,13 +130,11 @@ def run_cmd(failed):
 	'''
 	rc= data.returncode
 	both=data.stdout+data.stderr
-	if b'Segmentation fault' in both or b'missing' in both:
+	if rc !=0 or b'Segmentation fault' in both:
 		'''
 		since it failed, restore the database
 		'''
 		restore_db()
-		print("matched output")
-		sys.exit()
 		'''
 		if this is the first failure , try again.
 		'''
